@@ -17,7 +17,13 @@ FSJS project 2 - List Filter and Pagination
    scoped to that function.
 ***/
 const searchBar = document.createElement('input');
-const searchButton = document.createElement('button');
+const searchButton = document.createElement('button');//button for
+const pagination = document.createElement('div');//div for holding the pagination tool
+const studentList = document.querySelector('.student-list');//parent node of each student in the list
+const studentListItems = document.getElementsByClassName('student-item cf');
+const pages = parseFloat(studentListItems.length/10);
+console.log(pages);
+
 
 
 
@@ -35,9 +41,13 @@ const searchButton = document.createElement('button');
        that will be passed into the parens later when you call or
        "invoke" the function
 ***/
+function showPage(list, number) {
+  for(i=10; i<studentListItems.length ; i++){
+    list[i].style.display = 'none';
+  };
+}
 
-
-
+showPage(studentListItems, 1);
 
 /***
    Create the `appendPageLinks function` to generate, append, and add
@@ -52,23 +62,34 @@ const searchButton = document.createElement('button');
 
 
 //Adding search bar to the pages
-function displaySearch (){
-
-  //set Header and create Div that will hold search bar and search buttons
-  const header = document.querySelector ('.page-header');
+function displaySearch(){
+  //set HTML header element to variable && create/add Div that will hold search bar and search buttons
+  const header = document.querySelector('.page-header');
   const searchDiv = document.createElement('div');
-  searchDiv.ClassName = 'student-search';
+  searchDiv.className = 'student-search';
   header.appendChild (searchDiv);
-  //append the search bar to Div
-  searchDiv.appendChild(searchBar);
-  searchBar.className = 'student-search';
-  searchBar.value = 'Search student name...';
   //append search button to Div
   searchDiv.appendChild(searchButton);
   searchButton.className = 'student-search';
   searchButton.textContent = 'Search';
+  //append the search bar to Div
+  searchDiv.appendChild(searchBar);
+  searchBar.className = 'student-search';
+  searchBar.placeholder = 'Search student name...';
+
+
+}
+
+//function for dynamically displaying the pagination toolbar
+function displayPagination (){
+    const page = document.querySelector('.page');
+    pagination.className = 'pagination';
+    page.appendChild(pagination);
+    let pageList = document.createElement('ul');
+    pagination.appendChild(pageList);
 
 
 }
 
 displaySearch();
+displayPagination();
