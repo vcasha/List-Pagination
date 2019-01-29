@@ -21,38 +21,73 @@ const searchButton = document.createElement('button');//button for
 const pagination = document.createElement('div');//div for holding the pagination tool
 const studentList = document.querySelector('.student-list');//parent node of each student in the list
 const studentListItems = document.getElementsByClassName('student-item cf');
-const pages = parseFloat(studentListItems.length/10);
-console.log(pages);
+const pages = Math.ceil(studentListItems.length/10);
+const pageList = document.createElement('ul');
 
 
 
 
-/***
-   Create the `showPage` function to hide all of the items in the
-   list except for the ten you want to show.
 
-   Pro Tips:
-     - Keep in mind that with a list of 54 students, the last page
-       will only display four.
-     - Remember that the first student has an index of 0.
-     - Remember that a function `parameter` goes in the parens when
-       you initially define the function, and it acts as a variable
-       or a placeholder to represent the actual function `argument`
-       that will be passed into the parens later when you call or
-       "invoke" the function
-***/
-function showPage(list, number) {
-  for(i=10; i<studentListItems.length ; i++){
-    list[i].style.display = 'none';
+
+//function for displaying only the proper proper items for each page.
+function showPage(pageNumber) {
+  const listStart = (pageNumber - 1)*10;
+  const listEnd = listStart + 9;
+
+  for( let i = 0; i < studentListItems.length ; i++){
+    if (i < listStart || i > listEnd){
+      studentListItems[i].style.display = 'none';
+    };
   };
 }
 
-showPage(studentListItems, 1);
+showPage(1);
 
 /***
    Create the `appendPageLinks function` to generate, append, and add
    functionality to the pagination buttons.
 ***/
+
+//function for adding pagination <div> to the page and adding the <ul> to to the div
+function displayPagination (pageNumber){
+    const page = document.querySelector('.page');
+    pagination.className = 'pagination';
+    page.appendChild(pagination);
+    pagination.appendChild(pageList);
+    //this loop will create the <li> and <a> items for displaying the proper amount page numbers. The number of items to create
+    //is based on the value in the global constant 'pages'
+    for (i = 1; i <= pages; i++){
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        pageList.appendChild(li);
+        li.appendChild(a);
+        a.href = '#'
+        a.textContent = i;
+        if (i === pageNumber){
+          a.className = 'active';
+        } else {
+          a.className = '';
+        };
+
+
+    }
+}
+
+const paginationElements = pageList.childNodes;
+
+pagination.addEventListener('click', (e) => {
+    const pageNumber = event.target.textContent;
+    for(i = 0; i<paginationElements; i++){
+      if(i === pageNumber){
+        const activePage = paginationElements[i].childNodes;
+        activePage.className = 'active';
+      } else {
+        paginationElements[i].childNodes.className = '';
+    };
+  }
+});
+
+
 
 
 
@@ -80,16 +115,6 @@ function displaySearch(){
 
 }
 
-//function for dynamically displaying the pagination toolbar
-function displayPagination (){
-    const page = document.querySelector('.page');
-    pagination.className = 'pagination';
-    page.appendChild(pagination);
-    let pageList = document.createElement('ul');
-    pagination.appendChild(pageList);
-
-
-}
 
 displaySearch();
-displayPagination();
+displayPagination(1);
