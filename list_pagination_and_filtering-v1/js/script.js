@@ -16,27 +16,29 @@ FSJS project 2 - List Filter and Pagination
    will only be used inside of a function, then it can be locally
    scoped to that function.
 ***/
-const searchBar = document.createElement('input');
-const searchButton = document.createElement('button');//button for
-const pagination = document.createElement('div');//div for holding the pagination tool
+const searchBar = document.createElement('input');//creates element for the searchbar input
+const searchButton = document.createElement('button');//button for executing search
 const studentList = document.querySelector('.student-list');//parent node of each student in the list
 const studentListItems = document.getElementsByClassName('student-item cf');
-const pages = Math.ceil(studentListItems.length/10);
-const pageList = document.createElement('ul');
+const pages = Math.ceil(studentListItems.length/10);//constant for identifying the # of pages.
+const page = document.querySelector('.page');
 
 
 
 
 
 
-//function for displaying only the proper proper items for each page.
+
+//function for displaying the proper items related to the active page.
 function showPage(pageNumber) {
   const listStart = (pageNumber - 1)*10;
   const listEnd = listStart + 9;
 
   for( let i = 0; i < studentListItems.length ; i++){
-    if (i < listStart || i > listEnd){
+      if (i < listStart || i > listEnd){
       studentListItems[i].style.display = 'none';
+    }else{
+      studentListItems[i].style.display = '';
     };
   };
 }
@@ -50,12 +52,16 @@ showPage(1);
 
 //function for adding pagination <div> to the page and adding the <ul> to to the div
 function displayPagination (pageNumber){
-    const page = document.querySelector('.page');
+    //creating all necessary elements for the pagination options container
+    const pagination = document.createElement('div');//div for holding the pagination tool
     pagination.className = 'pagination';
+    const pageList = document.createElement('ul');//const element for the <ul> that will hold the indivdual page elements as <li>
+    pageList.className = 'pageNumbers';
     page.appendChild(pagination);
     pagination.appendChild(pageList);
-    //this loop will create the <li> and <a> items for displaying the proper amount page numbers. The number of items to create
-    //is based on the value in the global constant 'pages'
+    //this loop will create the <li> and <a> items for displaying the proper amount of page numbers. The number of items to create
+    //is based on the value in the global constant 'pages'. It will also set the proper <a> element to active so that it is properly
+    //styled to indicate it is selected.
     for (i = 1; i <= pages; i++){
         const li = document.createElement('li');
         const a = document.createElement('a');
@@ -71,21 +77,33 @@ function displayPagination (pageNumber){
 
 
     }
+    //Event handler for when user interacts with the pagination tool. Gets the text content (aka pageNumber) from the target element
+    // and passes it to the ShowPage function to display the proper content. Then I go through the
+    pagination.addEventListener('click', (e) => {
+        const pageLinks = document.querySelectorAll('a');
+        let pageNumber = e.target.textContent;
+        pageNumber = parseInt(pageNumber);
+        showPage(pageNumber);
+        for(let i = 0; i<pageLinks.length; i++){
+          if(i === (pageNumber-1)){
+            const activePage = pageLinks[i];
+            activePage.className = 'active';
+          } else{
+            const inactivePage = pageLinks[i];
+            inactivePage.className = '';
+        };
+      };
+
+    });
 }
+//contains an array of the <li> contained in the Pagination tools  <ul>
 
-const paginationElements = pageList.childNodes;
 
-pagination.addEventListener('click', (e) => {
-    const pageNumber = event.target.textContent;
-    for(i = 0; i<paginationElements; i++){
-      if(i === pageNumber){
-        const activePage = paginationElements[i].childNodes;
-        activePage.className = 'active';
-      } else {
-        paginationElements[i].childNodes.className = '';
-    };
-  }
-});
+//working on method for iterating over the page numbers to set the active page to the newly selected page
+// and remove it from the old page.
+
+
+
 
 
 
@@ -114,6 +132,13 @@ function displaySearch(){
 
 
 }
+
+/*
+Approach for Search list filtering
+
+Create empty array to store search results that match the search field
+use element.innerHTML for applying the error text when no match is found within the header container
+*/
 
 
 displaySearch();
