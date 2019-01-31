@@ -55,6 +55,9 @@ body{
       width: 50%;
       float: left;
     }
+    .student-details:hover{
+      transform: scale(1.1);
+    }
 
       .student-details .avatar{
         width: 40px;
@@ -95,11 +98,12 @@ body{
     border-bottom: none;
   }
 
+
 .pagination{
   margin: 40px 0 0 0;
   text-align: center;
 }
- 
+
   .pagination li{
     display: inline;
   }

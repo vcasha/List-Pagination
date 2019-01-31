@@ -19,8 +19,10 @@ FSJS project 2 - List Filter and Pagination
 const searchBar = document.createElement('input');//creates element for the searchbar input
 const searchButton = document.createElement('button');//button for executing search
 const studentList = document.querySelector('.student-list');//parent node of each student in the list
+let searchText = searchBar.value;
+const searchableList = document.querySelectorAll('h3');
 const studentListItems = document.getElementsByClassName('student-item cf');
-const pages = Math.ceil(studentListItems.length/10);//constant for identifying the # of pages.
+const pages = Math.ceil(studentListItems.length/10);//constant for identifying the # of pages to be displayed in pagination tool
 const page = document.querySelector('.page');
 
 
@@ -30,7 +32,7 @@ const page = document.querySelector('.page');
 
 
 //function for displaying the proper items related to the active page.
-function showPage(pageNumber) {
+function showPage(list, pageNumber) {
   const listStart = (pageNumber - 1)*10;
   const listEnd = listStart + 9;
 
@@ -43,7 +45,7 @@ function showPage(pageNumber) {
   };
 }
 
-showPage(1);
+
 
 /***
    Create the `appendPageLinks function` to generate, append, and add
@@ -80,6 +82,7 @@ function displayPagination (pageNumber){
     //Event handler for when user interacts with the pagination tool. Gets the text content (aka pageNumber) from the target element
     // and passes it to the ShowPage function to display the proper content. Then I go through the
     pagination.addEventListener('click', (e) => {
+        e.preventDefault();
         const pageLinks = document.querySelectorAll('a');
         let pageNumber = e.target.textContent;
         pageNumber = parseInt(pageNumber);
@@ -116,19 +119,42 @@ function displayPagination (pageNumber){
 
 //Adding search bar to the pages
 function displaySearch(){
-  //set HTML header element to variable && create/add Div that will hold search bar and search buttons
+  //set HTML header element to variable & create/add Div that will hold search bar and search buttons
   const header = document.querySelector('.page-header');
   const searchDiv = document.createElement('div');
   searchDiv.className = 'student-search';
   header.appendChild (searchDiv);
-  //append search button to Div
+
+  //append search button to Div and apply needed properties
   searchDiv.appendChild(searchButton);
   searchButton.className = 'student-search';
   searchButton.textContent = 'Search';
-  //append the search bar to Div
+
+  //append the search bar to Div and apply needed properties
   searchDiv.appendChild(searchBar);
   searchBar.className = 'student-search';
   searchBar.placeholder = 'Search student name...';
+
+
+  //****Event Handlers for Search functionality***//
+
+  /*This event handler will update the searchText variable whenever it is changed, so that
+  it can be passed as an argument in the function that will search the list.*/
+  searchBar.oninput = searchInput;
+
+  //the function that runs when the above event occurs
+  function searchInput(e) {
+      searchText = e.target.value.toUpperCase();
+
+  }
+  //function for going through array of students and matching the searchText to the <h3>.textContent
+  function searchList(text) {
+    //creates array for storing the students that match the search
+    const matchedSearch = [];
+    for (let i = 0; i<studentList.length; i++) {
+      if (studentList[i[textContent]][toUpperCase()] === searchText )
+        console.log
+    };
 
 
 }
@@ -140,6 +166,6 @@ Create empty array to store search results that match the search field
 use element.innerHTML for applying the error text when no match is found within the header container
 */
 
-
+showPage(1);
 displaySearch();
 displayPagination(1);
