@@ -20,10 +20,21 @@ const searchBar = document.createElement('input');//creates element for the sear
 const searchButton = document.createElement('button');//button for executing search
 const studentList = document.querySelector('.student-list');//parent node of each student in the list
 let searchText = searchBar.value;
+let matchedSearch = []; //creates array for storing the index of the students that match the search
 const searchableList = document.querySelectorAll('h3');
-const studentListItems = document.getElementsByClassName('student-item cf');
-const pages = Math.ceil(studentListItems.length/10);//constant for identifying the # of pages to be displayed in pagination tool
+const studentListItems = document.getElementsByClassName('student-item cf');//constant to hold ALL of the students in the list.
+const pagination = document.createElement('div');//div for holding the pagination tool
+pagination.className = 'pagination';
+const pages = (list) => {
+  return Math.ceil(list.length/10);
+} //constant for identifying the # of pages to be displayed in pagination tool. Can be passed an array as an argument so this can be used for calculating # for any array list it is passed
 const page = document.querySelector('.page');
+//creating all necessary elements for the pagination options container
+const pageList = document.createElement('ul');//const element for the <ul> that will hold the indivdual page elements as <li>
+pageList.className = 'pageNumbers';
+page.appendChild(pagination);
+pagination.appendChild(pageList);
+
 
 
 
@@ -34,15 +45,44 @@ const page = document.querySelector('.page');
 //function for displaying the proper items related to the active page.
 function showPage(list, pageNumber) {
   const listStart = (pageNumber - 1)*10;
-  const listEnd = listStart + 9;
+  const listEnd = listStart + 10;
 
-  for( let i = 0; i < studentListItems.length ; i++){
+
+  for( let i = 0; i < list.length ; i++){
       if (i < listStart || i > listEnd){
-      studentListItems[i].style.display = 'none';
+      list[i].style.display = 'none';
     }else{
-      studentListItems[i].style.display = '';
+      list[i].style.display = '';
     };
   };
+}
+
+function showSearch(list, pageNumber) {
+  const listStart = (pageNumber - 1)*10;
+  const listEnd  = listStart + 9;
+  while (pageList.firstChild) {
+    pageList.removeChild(pageList.firstChild);
+  };
+
+
+  for (let i = 0; i<studentListItems.length; i ++){
+    studentListItems[i].style.display = 'none';
+  };
+  if (list[listEnd] !== 'undefined'){
+    for (let i = listStart;i<listEnd; i++){
+      const index = list[i];
+      studentListItems[index].style.display = '';
+    };
+  } else if (list[listEnd] === 'undefined'){
+    for (let i = listStart;i<list.length; i++){
+      const index = list[i];
+      studentListItems[index].style.display = '';
+    };
+
+  };
+
+
+  displayPagination(list,pageNumber);
 }
 
 
@@ -53,18 +93,11 @@ function showPage(list, pageNumber) {
 ***/
 
 //function for adding pagination <div> to the page and adding the <ul> to to the div
-function displayPagination (pageNumber){
-    //creating all necessary elements for the pagination options container
-    const pagination = document.createElement('div');//div for holding the pagination tool
-    pagination.className = 'pagination';
-    const pageList = document.createElement('ul');//const element for the <ul> that will hold the indivdual page elements as <li>
-    pageList.className = 'pageNumbers';
-    page.appendChild(pagination);
-    pagination.appendChild(pageList);
+function displayPagination (list, pageNumber){
     //this loop will create the <li> and <a> items for displaying the proper amount of page numbers. The number of items to create
     //is based on the value in the global constant 'pages'. It will also set the proper <a> element to active so that it is properly
     //styled to indicate it is selected.
-    for (i = 1; i <= pages; i++){
+    for (i = 1; i <= pages(list); i++){
         const li = document.createElement('li');
         const a = document.createElement('a');
         pageList.appendChild(li);
@@ -86,7 +119,14 @@ function displayPagination (pageNumber){
         const pageLinks = document.querySelectorAll('a');
         let pageNumber = e.target.textContent;
         pageNumber = parseInt(pageNumber);
-        showPage(pageNumber);
+        if (searchText === ''){
+          showPage(studentListItems, pageNumber);
+        } else {
+          while (pageList.firstChild) {
+            pageList.removeChild(pageList.firstChild);
+          };
+            showSearch(matchedSearch,pageNumber);
+          };
         for(let i = 0; i<pageLinks.length; i++){
           if(i === (pageNumber-1)){
             const activePage = pageLinks[i];
@@ -146,26 +186,36 @@ function displaySearch(){
   function searchInput(e) {
       searchText = e.target.value.toUpperCase();
 
+      }
+
   }
-  //function for going through array of students and matching the searchText to the <h3>.textContent
-  function searchList(text) {
-    //creates array for storing the students that match the search
-    const matchedSearch = [];
-    for (let i = 0; i<studentList.length; i++) {
-      if (studentList[i[textContent]][toUpperCase()] === searchText )
-        console.log
+  //function for going through array of students and matching the searchText to the <h3>.textContent. It will then log the i variable which relates to the index of the student in the StudentListItems.
+  function findAndDisplay(text) {
+
+    for (let i = 0; i<searchableList.length; i++) {
+      const name = searchableList[i].textContent.toUpperCase();
+      if (name.indexOf(text) !== -1) {
+          matchedSearch.push(i);
+      };
     };
+    showSearch(matchedSearch,1);
+
+  }
+
+  //event handler for running searchBar
+  searchButton.addEventListener('click', () =>{
+    matchedSearch = []; // need this for resetting the matchedSearch array whenever a user has already ran a search but is now running a new one
+    findAndDisplay(searchText);
+
+});
 
 
-}
 
 /*
-Approach for Search list filtering
 
-Create empty array to store search results that match the search field
 use element.innerHTML for applying the error text when no match is found within the header container
 */
 
-showPage(1);
+showPage(studentListItems,1);
 displaySearch();
-displayPagination(1);
+displayPagination(studentListItems,1);
