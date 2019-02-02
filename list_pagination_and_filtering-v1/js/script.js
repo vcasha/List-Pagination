@@ -58,8 +58,12 @@ function showPage(list, pageNumber) {
 }
 
 function showSearch(list, pageNumber) {
+  //listStart and listEnd are used for defining where in the array of students to start displaying based on pageNumber.
   const listStart = (pageNumber - 1)*10;
-  const listEnd  = listStart + 9;
+  const listEnd  = listStart + 10;
+  //creating reference for future logic check
+  const listCheck = list[listEnd];
+  //this will remove the existing pagination elements since we will be creating a new one based on the length of the matchedSearch list
   while (pageList.firstChild) {
     pageList.removeChild(pageList.firstChild);
   };
@@ -68,20 +72,22 @@ function showSearch(list, pageNumber) {
   for (let i = 0; i<studentListItems.length; i ++){
     studentListItems[i].style.display = 'none';
   };
-  if (list[listEnd] !== 'undefined'){
-    for (let i = listStart;i<listEnd; i++){
-      const index = list[i];
-      studentListItems[index].style.display = '';
-    };
-  } else if (list[listEnd] === 'undefined'){
+  //if this variable is undefined it means the array ends before getting to the listEnd item (aka a page without 10 items) so instead of going to listEnd we just go to list length
+  if (listCheck === undefined){
     for (let i = listStart;i<list.length; i++){
       const index = list[i];
       studentListItems[index].style.display = '';
     };
+    //if list is long enough to display all 10 then we will use this for loop logic for getting proper list of elements and setting them to be displayed on the page
+  } else {
+      for (let i = listStart;i<listEnd; i++){
+        const index = list[i];
+        studentListItems[index].style.display = '';
+    };
 
   };
 
-
+  //run this function to create the proper pagination numbers based on the matchedSearch length
   displayPagination(list,pageNumber);
 }
 
