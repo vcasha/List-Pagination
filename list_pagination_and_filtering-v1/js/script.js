@@ -25,10 +25,12 @@ const searchableList = document.querySelectorAll('h3');
 const studentListItems = document.getElementsByClassName('student-item cf');//constant to hold ALL of the students in the list.
 const pagination = document.createElement('div');//div for holding the pagination tool
 pagination.className = 'pagination';
+//constant for identifying the # of pages to be displayed in pagination tool. Can be passed an array as an argument so this can be used for calculating # for any array list it is passed
 const pages = (list) => {
   return Math.ceil(list.length/10);
-} //constant for identifying the # of pages to be displayed in pagination tool. Can be passed an array as an argument so this can be used for calculating # for any array list it is passed
+}
 const page = document.querySelector('.page');
+const header = document.querySelector('.page-header');
 //creating all necessary elements for the pagination options container
 const pageList = document.createElement('ul');//const element for the <ul> that will hold the indivdual page elements as <li>
 pageList.className = 'pageNumbers';
@@ -166,7 +168,6 @@ function displayPagination (list, pageNumber){
 //Adding search bar to the pages
 function displaySearch(){
   //set HTML header element to variable & create/add Div that will hold search bar and search buttons
-  const header = document.querySelector('.page-header');
   const searchDiv = document.createElement('div');
   searchDiv.className = 'student-search';
   header.appendChild (searchDiv);
@@ -204,7 +205,9 @@ function displaySearch(){
           matchedSearch.push(i);
       };
     };
-    showSearch(matchedSearch,1);
+      if (matchedSearch.length !== 0){
+        showSearch(matchedSearch,1);
+      };
 
   }
 
@@ -212,6 +215,44 @@ function displaySearch(){
   searchButton.addEventListener('click', () =>{
     matchedSearch = []; // need this for resetting the matchedSearch array whenever a user has already ran a search but is now running a new one
     findAndDisplay(searchText);
+    if (matchedSearch.length === 0 && searchBar.value !== ''){
+      studentList.style.display = `none`;
+      pagination.style.display ='none'
+
+      searchBar.addEventListener('focus',(e)=> {
+        //studentList.innerHTML = ''showPage(studentListItems,1);''
+        e.target.placeholder = 'Search student name...';
+        studentList.style.display = '';
+        pagination.style.display = '';
+
+
+      });
+
+    // Adding a class that I added to CSS for that defines an animation
+      searchBar.classList.add('error');
+      searchBar.placeholder = 'No matches try again';
+
+          // remove the class after the animation completes
+          setTimeout(function() {
+              searchBar.classList.remove('error');
+          }, 300);
+
+  } else if (searchBar.value === ''){
+    searchBar.classList.add('error');
+    searchBar.placeholder = 'Must input a value';
+    searchBar.addEventListener('focus', (e) => {
+      if (e.target.placeholder === 'No matches try again'){}
+      e.target.placeholder = 'Search student name...';
+    });
+
+        // remove the class after the animation completes
+        setTimeout(function() {
+            searchBar.classList.remove('error');
+        }, 300);
+    } else {
+
+      findAndDisplay(searchText);
+    };
 
 });
 

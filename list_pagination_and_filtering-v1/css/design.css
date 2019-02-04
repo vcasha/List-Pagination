@@ -30,7 +30,8 @@ body{
     .page-header .student-search input{
       border-radius: 5px;
       border: 1px solid #eaeaea;
-      padding: 8px 15px;
+      padding: 8px 25px;
+      margin-right: 10px;
       font-size: 14px;
     }
 
@@ -120,4 +121,15 @@ body{
     .pagination li a:hover{
       background-color: #4ba6c3;
       color: #fff;
+    }
+
+    .error {
+        position: relative;
+        animation: shake .1s linear;
+        animation-iteration-count: 3;
+    }
+
+    @keyframes shake {
+        0% { left: -5px; }
+        100% { right: -5px; }
     }
