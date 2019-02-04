@@ -216,12 +216,14 @@ function displaySearch(){
     matchedSearch = []; // need this for resetting the matchedSearch array whenever a user has already ran a search but is now running a new one
     findAndDisplay(searchText);
     if (matchedSearch.length === 0 && searchBar.value !== ''){
+      //need to add content to page for stating no matches found
       studentList.style.display = `none`;
       pagination.style.display ='none'
 
       searchBar.addEventListener('focus',(e)=> {
         //studentList.innerHTML = ''showPage(studentListItems,1);''
         e.target.placeholder = 'Search student name...';
+        showPage(studentListItems,1);
         studentList.style.display = '';
         pagination.style.display = '';
 
