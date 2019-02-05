@@ -67,6 +67,8 @@ function showSearch(list, pageNumber) {
   const listCheck = list[listEnd];
   //this will remove the existing pagination elements since we will be creating a new one based on the length of the matchedSearch list
   //while (pageList.firstChild) {
+    //pageList.removeChild(pageList.firstChild);
+  //};
 
   //loop through and hide all students in the list in preparation for next steps
   for (let i = 0; i<studentListItems.length; i ++){
