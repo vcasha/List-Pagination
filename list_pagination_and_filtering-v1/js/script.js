@@ -66,20 +66,21 @@ function showSearch(list, pageNumber) {
   //creating reference for future logic check
   const listCheck = list[listEnd];
   //this will remove the existing pagination elements since we will be creating a new one based on the length of the matchedSearch list
-  while (pageList.firstChild) {
-    pageList.removeChild(pageList.firstChild);
-  };
+  //while (pageList.firstChild) {
 
-
+  //loop through and hide all students in the list in preparation for next steps
   for (let i = 0; i<studentListItems.length; i ++){
     studentListItems[i].style.display = 'none';
   };
-  //if this variable is undefined it means the array ends before getting to the listEnd item (aka a page without 10 items) so instead of going to listEnd we just go to list length
+  //Option 1 for displaying the matchedSearch items on the page
+  //if this variable is undefined it means the array ends before getting to the listEnd item
+  //(aka a page without 10 items) so instead looping unitl i<listEnd we just loop until i<list.length
   if (listCheck === undefined){
     for (let i = listStart;i<list.length; i++){
       const index = list[i];
       studentListItems[index].style.display = '';
     };
+    //Option 2 for displaying the matchedSearch items on the page
     //if list is long enough to display all 10 then we will use this for loop logic for getting proper list of elements and setting them to be displayed on the page
   } else {
       for (let i = listStart;i<listEnd; i++){
@@ -90,7 +91,7 @@ function showSearch(list, pageNumber) {
   };
 
   //run this function to create the proper pagination numbers based on the matchedSearch length
-  displayPagination(list,pageNumber);
+
 }
 
 
@@ -102,24 +103,60 @@ function showSearch(list, pageNumber) {
 
 //function for adding pagination <div> to the page and adding the <ul> to to the div
 function displayPagination (list, pageNumber){
-    //this loop will create the <li> and <a> items for displaying the proper amount of page numbers. The number of items to create
-    //is based on the value in the global constant 'pages'. It will also set the proper <a> element to active so that it is properly
-    //styled to indicate it is selected.
-    for (i = 1; i <= pages(list); i++){
-        const li = document.createElement('li');
-        const a = document.createElement('a');
-        pageList.appendChild(li);
-        li.appendChild(a);
-        a.href = '#'
-        a.textContent = i;
-        if (i === pageNumber){
-          a.className = 'active';
-        } else {
-          a.className = '';
+  //function for creating the proper number of page elements and setting the proper class.
+  function createPages(i){
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    pageList.appendChild(li);
+    li.appendChild(a);
+    a.href = '#'
+    a.textContent = i;
+    if (i === pageNumber){
+      a.className = 'active';
+    } else {
+      a.className = '';
+    };
+  }
+
+    //when a search is ran I call the DisplayPagination function. With this if statement, I can hide/displayed
+    //the proper number of existing pagination items based on search results.
+    if(matchedSearch.length !== 0){
+      //constant to hold
+      const pageItems = document.querySelectorAll('.pageNumbers li');
+      //this is a function for defining the current # of pages displayed which will be used for logic below
+      const currentPages = () => {
+        let count = 0;
+        for (let i =0; i<pageItems.length; i++){
+          if (pageItems[i].style.display === ''){
+            count += 1;
+          };
         };
-
-
+        return count;
+      }
+      //this variable will
+      //const pagesDisplayed = currentPages();
+      //calls the function pages which calculates the number of pages needed based on the length
+      //of the array it is passed. In this case matchedSearch
+      const newPages = pages(matchedSearch);
+      const pagesDifference = newPages - currentPages();
+        if (pagesDifference>0){
+          for (let i = currentPages(); i< newPages; i++){
+            pageItems[i].style.display = '';
+          };
+        } else if (pagesDifference<0){
+          const pagestoHide = Math.abs(pagesDifference);
+          for (let i = (newPages); i<pageItems.length; i++){
+            pageItems[i].style.display = 'none';
+          };
+        };
+    // this else statement is pretty much used for when the page is first loaded and we have our initial list of students
+    // and thus create the master # of pagination options that could be hidden/unhidden based on search results
+    } else {
+        for (i = 1; i <= pages(list); i++){
+          createPages(i);
+        };
     }
+
     //Event handler for when user interacts with the pagination tool. Gets the text content (aka pageNumber) from the target element
     // and passes it to the ShowPage function to display the proper content. Then I go through the
     pagination.addEventListener('click', (e) => {
@@ -130,9 +167,6 @@ function displayPagination (list, pageNumber){
         if (searchText === ''){
           showPage(studentListItems, pageNumber);
         } else {
-          while (pageList.firstChild) {
-            pageList.removeChild(pageList.firstChild);
-          };
             showSearch(matchedSearch,pageNumber);
           };
         for(let i = 0; i<pageLinks.length; i++){
@@ -197,7 +231,7 @@ function displaySearch(){
 
   }
   //function for going through array of students and matching the searchText to the <h3>.textContent. It will then log the i variable which relates to the index of the student in the StudentListItems.
-  function findAndDisplay(text) {
+  function findMatches(text) {
 
     for (let i = 0; i<searchableList.length; i++) {
       const name = searchableList[i].textContent.toUpperCase();
@@ -205,16 +239,13 @@ function displaySearch(){
           matchedSearch.push(i);
       };
     };
-      if (matchedSearch.length !== 0){
-        showSearch(matchedSearch,1);
-      };
 
   }
 
   //event handler for running searchBar
   searchButton.addEventListener('click', () =>{
     matchedSearch = []; // need this for resetting the matchedSearch array whenever a user has already ran a search but is now running a new one
-    findAndDisplay(searchText);
+    findMatches(searchText);//function defined above for determing the matched items.
     if (matchedSearch.length === 0 && searchBar.value !== ''){
       //need to add content to page for stating no matches found
       studentList.style.display = `none`;
@@ -252,8 +283,9 @@ function displaySearch(){
             searchBar.classList.remove('error');
         }, 300);
     } else {
+      displayPagination(matchedSearch,1);
+      showSearch(matchedSearch,1);
 
-      findAndDisplay(searchText);
     };
 
 });
