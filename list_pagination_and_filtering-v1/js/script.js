@@ -47,7 +47,7 @@ pagination.appendChild(pageList);
 //function for displaying the proper items related to the active page.
 function showPage(list, pageNumber) {
   const listStart = (pageNumber - 1)*10;
-  const listEnd = listStart + 10;
+  const listEnd = listStart + 9;
 
 
   for( let i = 0; i < list.length ; i++){
@@ -96,7 +96,28 @@ function showSearch(list, pageNumber) {
 
 }
 
+searchBar.addEventListener('keyup', (e) => {
+    //function for unhiding the pagination tool and list when no results are found
+    function unhideDisplay (){
+      if (studentList.style.display === 'none'){
+        studentList.style.display = '';
+        pagination.style.display ='';
+      };
+    }
+    searchText += '';
+    searchText.toUpperCase();
+    if (searchText !== ''){
+      unhideDisplay();
+      findAndDisplay();
+    } else if (searchText === '') {
+      unhideDisplay();
+      matchedSearch =[];
+      showPage(studentListItems,1);
+      displayPagination (studentListItems, 1);
 
+    };
+
+});
 
 /***
    Create the `appendPageLinks function` to generate, append, and add
@@ -120,9 +141,12 @@ function displayPagination (list, pageNumber){
     };
   }
 
+
+
     //when a search is ran I call the DisplayPagination function. With this if statement, I can hide/displayed
-    //the proper number of existing pagination items based on search results.
-    if(matchedSearch.length !== 0){
+    //the proper number of existing pagination items based on search results or to display all pages again if user clears search box
+    let activeElement = document.activeElement
+    if(matchedSearch.length !== 0 || activeElement === searchBar){
       //constant to hold
       const pageItems = document.querySelectorAll('.pageNumbers li');
       //this is a function for defining the current # of pages displayed which will be used for logic below
@@ -139,7 +163,13 @@ function displayPagination (list, pageNumber){
       //const pagesDisplayed = currentPages();
       //calls the function pages which calculates the number of pages needed based on the length
       //of the array it is passed. In this case matchedSearch
-      const newPages = pages(matchedSearch);
+      let newPages;
+      if (matchedSearch.length === 0){
+        newPages = pages(studentListItems);
+      } else {
+        newPages = pages(matchedSearch);
+      }
+
       const pagesDifference = newPages - currentPages();
         if (pagesDifference>0){
           for (let i = currentPages(); i< newPages; i++){
@@ -243,17 +273,15 @@ function displaySearch(){
     };
 
   }
-
-  //event handler for running searchBar
-  searchButton.addEventListener('click', () =>{
+function findAndDisplay () {
     matchedSearch = []; // need this for resetting the matchedSearch array whenever a user has already ran a search but is now running a new one
     findMatches(searchText);//function defined above for determing the matched items.
-    if (matchedSearch.length === 0 && searchBar.value !== ''){
+    if (matchedSearch.length === 0 && searchText !== ''){
       //need to add content to page for stating no matches found
       studentList.style.display = `none`;
       pagination.style.display ='none'
 
-      searchBar.addEventListener('focus',(e)=> {
+      /*searchBar.addEventListener('focus',(e)=> {
         //studentList.innerHTML = ''showPage(studentListItems,1);''
         e.target.placeholder = 'Search student name...';
         showPage(studentListItems,1);
@@ -262,21 +290,23 @@ function displaySearch(){
 
 
       });
-
-    // Adding a class that I added to CSS for that defines an animation
+*/
+    // Adding a class that I added to CSS that defines an animation
       searchBar.classList.add('error');
-      searchBar.placeholder = 'No matches try again';
 
-          // remove the class after the animation completes
-          setTimeout(function() {
-              searchBar.classList.remove('error');
-          }, 300);
+        // remove the class after the animation completes
+      setTimeout(function() {
+          searchBar.classList.remove('error');
+        }, 300);
+
+
+
 
   } else if (searchBar.value === ''){
     searchBar.classList.add('error');
     searchBar.placeholder = 'Must input a value';
     searchBar.addEventListener('focus', (e) => {
-      if (e.target.placeholder === 'No matches try again'){}
+      if (e.target.placeholder === 'Must input a value'){}
       e.target.placeholder = 'Search student name...';
     });
 
@@ -289,8 +319,10 @@ function displaySearch(){
       showSearch(matchedSearch,1);
 
     };
+  }
 
-});
+  //event handler for running searchBar
+  searchButton.addEventListener('click', findAndDisplay);
 
 
 
