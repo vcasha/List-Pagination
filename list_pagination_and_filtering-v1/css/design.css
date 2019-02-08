@@ -43,6 +43,17 @@ body{
       background-color: #4ba6c3;
       color: #fff
     }
+.noMatch{
+  margin: 50px auto;
+  width: 70%;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 50px;
+  color: #009Fc2;
+  text-align: center;
+
+
+}
 
 .student-list{}
 

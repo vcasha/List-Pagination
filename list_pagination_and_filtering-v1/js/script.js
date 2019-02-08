@@ -36,10 +36,8 @@ const pageList = document.createElement('ul');//const element for the <ul> that 
 pageList.className = 'pageNumbers';
 page.appendChild(pagination);
 pagination.appendChild(pageList);
-
-
-
-
+//this is the constant for storing reference to the div I will use for displaying the 'No Matches found' text
+const noMatch = document.querySelector('.noMatch');
 
 
 
@@ -97,25 +95,30 @@ function showSearch(list, pageNumber) {
 }
 
 searchBar.addEventListener('keyup', (e) => {
-    //function for unhiding the pagination tool and list when no results are found
-    function unhideDisplay (){
+
+    //function for unhiding the list display and hiding the 'noMatch'div when a matched search is found AFTER the user got to a 'No match' result.
+    function clearNoMatch (){
       if (studentList.style.display === 'none'){
         studentList.style.display = '';
         pagination.style.display ='';
+        noMatch.style.display = 'none';
+
       };
     }
     searchText += '';
     searchText.toUpperCase();
     if (searchText !== ''){
-      unhideDisplay();
+      clearNoMatch();
       findAndDisplay();
+      if (matchedSearch.length !== 0){
+        searchButton.textContent = 'Search';
+      };
     } else if (searchText === '') {
-      unhideDisplay();
+      clearNoMatch();
       matchedSearch =[];
       showPage(studentListItems,1);
       displayPagination (studentListItems, 1);
-
-    };
+    }
 
 });
 
@@ -126,6 +129,8 @@ searchBar.addEventListener('keyup', (e) => {
 
 //function for adding pagination <div> to the page and adding the <ul> to to the div
 function displayPagination (list, pageNumber){
+  //creates reference for all of the pages so that I can assign the active page class for proper highlighting
+const pageLinks = document.querySelectorAll('a');
   //function for creating the proper number of page elements and setting the proper class.
   function createPages(i){
     const li = document.createElement('li');
@@ -193,7 +198,6 @@ function displayPagination (list, pageNumber){
     // and passes it to the ShowPage function to display the proper content. Then I go through the
     pagination.addEventListener('click', (e) => {
         e.preventDefault();
-        const pageLinks = document.querySelectorAll('a');
         let pageNumber = e.target.textContent;
         pageNumber = parseInt(pageNumber);
         if (searchText === ''){
@@ -213,20 +217,6 @@ function displayPagination (list, pageNumber){
 
     });
 }
-//contains an array of the <li> contained in the Pagination tools  <ul>
-
-
-//working on method for iterating over the page numbers to set the active page to the newly selected page
-// and remove it from the old page.
-
-
-
-
-
-
-
-
-
 
 // Remember to delete the comments that came with this file, and replace them with your own code comments.
 
@@ -281,16 +271,6 @@ function findAndDisplay () {
       studentList.style.display = `none`;
       pagination.style.display ='none'
 
-      /*searchBar.addEventListener('focus',(e)=> {
-        //studentList.innerHTML = ''showPage(studentListItems,1);''
-        e.target.placeholder = 'Search student name...';
-        showPage(studentListItems,1);
-        studentList.style.display = '';
-        pagination.style.display = '';
-
-
-      });
-*/
     // Adding a class that I added to CSS that defines an animation
       searchBar.classList.add('error');
 
@@ -300,15 +280,17 @@ function findAndDisplay () {
         }, 300);
 
 
+      noMatch.style.display = '';
+      noMatch.textContent = `No matches. Please adjust your search value.`;
+
+
+
+
+
 
 
   } else if (searchBar.value === ''){
     searchBar.classList.add('error');
-    searchBar.placeholder = 'Must input a value';
-    searchBar.addEventListener('focus', (e) => {
-      if (e.target.placeholder === 'Must input a value'){}
-      e.target.placeholder = 'Search student name...';
-    });
 
         // remove the class after the animation completes
         setTimeout(function() {
@@ -334,3 +316,4 @@ use element.innerHTML for applying the error text when no match is found within 
 showPage(studentListItems,1);
 displaySearch();
 displayPagination(studentListItems,1);
+noMatch.style.display = 'none';
