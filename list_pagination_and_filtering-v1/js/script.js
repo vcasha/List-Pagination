@@ -97,7 +97,7 @@ function showSearch(list, pageNumber) {
 searchBar.addEventListener('keyup', (e) => {
 
     //function for unhiding the list display and hiding the 'noMatch'div when a matched search is found AFTER the user got to a 'No match' result.
-    function clearNoMatch (){
+    function clearNoMatchDisplay (){
       if (studentList.style.display === 'none'){
         studentList.style.display = '';
         pagination.style.display ='';
@@ -108,13 +108,10 @@ searchBar.addEventListener('keyup', (e) => {
     searchText += '';
     searchText.toUpperCase();
     if (searchText !== ''){
-      clearNoMatch();
+      clearNoMatchDisplay();
       findAndDisplay();
-      if (matchedSearch.length !== 0){
-        searchButton.textContent = 'Search';
-      };
     } else if (searchText === '') {
-      clearNoMatch();
+      clearNoMatchDisplay();
       matchedSearch =[];
       showPage(studentListItems,1);
       displayPagination (studentListItems, 1);
@@ -204,12 +201,12 @@ const pageLinks = document.querySelectorAll('a');
           showPage(studentListItems, pageNumber);
         } else {
             showSearch(matchedSearch,pageNumber);
-          };
+        };
         for(let i = 0; i<pageLinks.length; i++){
           if(i === (pageNumber-1)){
             const activePage = pageLinks[i];
             activePage.className = 'active';
-          } else{
+          }else{
             const inactivePage = pageLinks[i];
             inactivePage.className = '';
         };
