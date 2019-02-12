@@ -95,26 +95,34 @@ function showSearch(list, pageNumber) {
 }
 
 searchBar.addEventListener('keyup', (e) => {
-
+  const pageLinks = document.querySelectorAll('a');
+  function resetActivePage(){
+    const pageOne = pageLinks[0];
+    pageOne.className = 'active';
+    for (let i = 1; i<pageLinks.length; i++){
+      pageLinks[i].className = '';
+    };
+  }
     //function for unhiding the list display and hiding the 'noMatch'div when a matched search is found AFTER the user got to a 'No match' result.
-    function clearNoMatchDisplay (){
-      if (studentList.style.display === 'none'){
-        studentList.style.display = '';
-        pagination.style.display ='';
-        noMatch.style.display = 'none';
-
-      };
-    }
-    searchText += '';
-    searchText.toUpperCase();
-    if (searchText !== ''){
-      clearNoMatchDisplay();
-      findAndDisplay();
-    } else if (searchText === '') {
-      clearNoMatchDisplay();
-      matchedSearch =[];
-      showPage(studentListItems,1);
-      displayPagination (studentListItems, 1);
+  function clearNoMatchDisplay (){
+    if (studentList.style.display === 'none'){
+      studentList.style.display = '';
+      pagination.style.display ='';
+      noMatch.style.display = 'none';
+    };
+  }
+  searchText += '';
+  searchText.toUpperCase();
+  if (searchText !== ''){
+    resetActivePage();
+    clearNoMatchDisplay();
+    findAndDisplay();
+  } else if (searchText === '') {
+    clearNoMatchDisplay();
+    matchedSearch =[];
+    resetActivePage();
+    showPage(studentListItems,1);
+    displayPagination (studentListItems, 1);
     }
 
 });
@@ -126,8 +134,7 @@ searchBar.addEventListener('keyup', (e) => {
 
 //function for adding pagination <div> to the page and adding the <ul> to to the div
 function displayPagination (list, pageNumber){
-  //creates reference for all of the pages so that I can assign the active page class for proper highlighting
-const pageLinks = document.querySelectorAll('a');
+
   //function for creating the proper number of page elements and setting the proper class.
   function createPages(i){
     const li = document.createElement('li');
@@ -149,12 +156,12 @@ const pageLinks = document.querySelectorAll('a');
     //the proper number of existing pagination items based on search results or to display all pages again if user clears search box
     let activeElement = document.activeElement
     if(matchedSearch.length !== 0 || activeElement === searchBar){
-      //constant to hold
+      //constant to hold the count of li for hiding and showing
       const pageItems = document.querySelectorAll('.pageNumbers li');
       //this is a function for defining the current # of pages displayed which will be used for logic below
       const currentPages = () => {
         let count = 0;
-        for (let i =0; i<pageItems.length; i++){
+        for (let i = 0; i<pageItems.length; i++){
           if (pageItems[i].style.display === ''){
             count += 1;
           };
@@ -190,6 +197,8 @@ const pageLinks = document.querySelectorAll('a');
           createPages(i);
         };
     }
+    //creates reference for all of the pages so that I can assign the active page class for proper highlighting
+  const pageLinks = document.querySelectorAll('a');
 
     //Event handler for when user interacts with the pagination tool. Gets the text content (aka pageNumber) from the target element
     // and passes it to the ShowPage function to display the proper content. Then I go through the
