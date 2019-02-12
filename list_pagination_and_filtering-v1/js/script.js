@@ -18,22 +18,22 @@ FSJS project 2 - List Filter and Pagination
 ***/
 const searchBar = document.createElement('input');//creates element for the searchbar input
 const searchButton = document.createElement('button');//button for executing search
-const studentList = document.querySelector('.student-list');//parent node of each student in the list
-let searchText = searchBar.value;
-let matchedSearch = []; //creates array for storing the index of the students that match the search
-const searchableList = document.querySelectorAll('h3');
-const studentListItems = document.getElementsByClassName('student-item cf');//constant to hold ALL of the students in the list.
+let searchText = searchBar.value;//variable for holding the input value of the searchBar
+const studentList = document.querySelector('.student-list');//parent element of all the students in the list. Needed for calling to make style changes
+const searchableList = document.querySelectorAll('h3');//This stores the name of each list item to which the search can be compared against
+const searchableEmails = document.querySelectorAll('.email');//this stores the e-mail of each list item to which the search can be compared against
+const studentListItems = document.getElementsByClassName('student-item cf');//This is the master list. When the page loads or an event has occurred to display ALL of the list items, this is what displays.
+let matchedSearch = []; //creates array for storing the index of the students that match the search. Will use this array to then pass to the array of the master List to then know the index of the items that should be displayed
 const pagination = document.createElement('div');//div for holding the pagination tool
 pagination.className = 'pagination';
-//constant for identifying the # of pages to be displayed in pagination tool. Can be passed an array as an argument so this can be used for calculating # for any array list it is passed
-const pages = (list) => {
-  return Math.ceil(list.length/10);
-}
+//constant for identifying the # of pages to be displayed in pagination tool. Can be passed a list as an argument and then calculate the # of pages based on the length of the list
+const pages = (list) => {return Math.ceil(list.length/10);}
+
 const page = document.querySelector('.page');
-const header = document.querySelector('.page-header');
+const header = document.querySelector('.page-header');//reference element for appending the search bar
 //creating all necessary elements for the pagination options container
 const pageList = document.createElement('ul');//const element for the <ul> that will hold the indivdual page elements as <li>
-pageList.className = 'pageNumbers';
+pageList.className = 'pageNumbers';//setting class name for getting proper animation/display
 page.appendChild(pagination);
 pagination.appendChild(pageList);
 //this is the constant for storing reference to the div I will use for displaying the 'No Matches found' text
@@ -44,10 +44,11 @@ const noMatch = document.querySelector('.noMatch');
 
 //function for displaying the proper items related to the active page.
 function showPage(list, pageNumber) {
+  //these constants are used to identify the index range that should be displayed (while inversely identifying the index range to not be displayed)
   const listStart = (pageNumber - 1)*10;
   const listEnd = listStart + 9;
 
-
+  //based on range above, we will loop through the list that was passed in our argument setting the display (or non-display) accordingly.
   for( let i = 0; i < list.length ; i++){
       if (i < listStart || i > listEnd){
       list[i].style.display = 'none';
@@ -58,17 +59,10 @@ function showPage(list, pageNumber) {
 }
 
 function showSearch(list, pageNumber) {
-  //listStart and listEnd are used for defining where in the array of students to start displaying based on pageNumber.
   const listStart = (pageNumber - 1)*10;
   const listEnd  = listStart + 10;
   //creating reference for future logic check
   const listCheck = list[listEnd];
-  //this will remove the existing pagination elements since we will be creating a new one based on the length of the matchedSearch list
-  //while (pageList.firstChild) {
-    //pageList.removeChild(pageList.firstChild);
-  //};
-
-  //loop through and hide all students in the list in preparation for next steps
   for (let i = 0; i<studentListItems.length; i ++){
     studentListItems[i].style.display = 'none';
   };
@@ -263,7 +257,8 @@ function displaySearch(){
 
     for (let i = 0; i<searchableList.length; i++) {
       const name = searchableList[i].textContent.toUpperCase();
-      if (name.indexOf(text) !== -1) {
+      const email = searchableEmails[i].textContent.toUpperCase();
+      if (name.indexOf(text) !== -1 || email.indexOf(text) !== -1) {
           matchedSearch.push(i);
       };
     };
@@ -322,4 +317,4 @@ use element.innerHTML for applying the error text when no match is found within 
 showPage(studentListItems,1);
 displaySearch();
 displayPagination(studentListItems,1);
-noMatch.style.display = 'none';
+noMatch.style.display = 'none';//I created an HTML element for holding the text when there are no matched searches. Since I need to sometimes display it and sometimes not, I have to programattically turn it off and on. I need it off by default, thusly I am declaring it's display to none.
