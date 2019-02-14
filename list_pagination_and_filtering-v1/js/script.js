@@ -144,7 +144,7 @@ searchBar.addEventListener('keyup', (e) => {
    functionality to the pagination buttons.
 ***/
 
-//Contains all logic for how many items to displa, which page should be active and has the event handler for the pagination options
+//Contains all logic for how many items to display, which page should be active and has the event handler for the pagination options
 function displayPagination (list, pageNumber){
     //function for creating the initial number of page elements for the master list and setting the proper class.
   function createPages(i){
@@ -160,7 +160,9 @@ function displayPagination (list, pageNumber){
       a.className = '';
     };
   }
-  //when a search is ran I call the DisplayPagination function. With this if statement, I can hide/displayed
+  //when a search is ran I call the DisplayPagination function. With this function, I can set up the various cases in which the page count needs to go from
+  //a specific number
+  // if statement, I can hide/displayed
   //the proper number of existing pagination items based on search results or to display all pages again if user clears search box
   function updatePageDisplay () {
     //constant to hold the count of li for hiding and showing
@@ -327,6 +329,7 @@ function findAndDisplay () {
   }
   //event handler for running searchBar when user clicks
   searchButton.addEventListener('click', ()=>{
+
     if (searchButton.textContent === 'Search'){
       findAndDisplay;
     } if (searchButton.textContent === 'Clear'){
