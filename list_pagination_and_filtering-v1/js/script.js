@@ -10,6 +10,7 @@ FSJS project 2 - List Filter and Pagination
    Add your global variables that store the DOM elements you will
    need to reference and/or manipulate.
 
+
    But be mindful of which variables should be global and which
    should be locally scoped to one of the two main functions you're
    going to create. A good general rule of thumb is if the variable
@@ -37,7 +38,29 @@ pageList.className = 'pageNumbers';//setting class name for getting proper anima
 page.appendChild(pagination);
 pagination.appendChild(pageList);
 //this is the constant for storing reference to the div I will use for displaying the 'No Matches found' text
-const noMatch = document.querySelector('.noMatch');
+let pageLinks = '';
+
+//This will introduce all needed constants for the display when there is no match found in the search.
+const noMatchDisplay = document.createElement('div');
+noMatchDisplay.className = 'noMatch'
+const parentDiv = studentList.parentNode;
+parentDiv.insertBefore(noMatchDisplay,studentList);
+noMatchDisplay.style.display = 'none';
+const noMatchImage = document.createElement('img');
+noMatchImage.setAttribute('src','images/tryAgain.png');
+noMatchImage.setAttribute('height', '300');
+noMatchImage.setAttribute('width', '500');
+noMatchDisplay.appendChild(noMatchImage);
+//function for unhiding the list display and hiding the 'noMatch'div when a matched search is found AFTER the user got to a 'No match' result.
+function clearNoMatchDisplay (){
+  if (studentList.style.display === 'none'){
+    studentList.style.display = '';
+    pagination.style.display ='';
+    noMatchDisplay.style.display = 'none';
+  };
+}
+
+
 
 
 
@@ -84,28 +107,25 @@ function showPage(list, pageNumber) {
   }
 }
 
+//function for resetting active page to 1 to handle multiple scenarios that occur during search being active
+function resetActivePage(){
+  const pageOne = pageLinks[0];
+  pageOne.className = 'active';
+  for (let i = 1; i<pageLinks.length; i++){
+    pageLinks[i].className = '';
+  };
+}
+
 //event handler for running search as a user types into search bar
 searchBar.addEventListener('keyup', (e) => {
-  const pageLinks = document.querySelectorAll('a');
-  //function for resetting active page to 1 to handle multiple scenarios that occur during search being active
-  function resetActivePage(){
-    const pageOne = pageLinks[0];
-    pageOne.className = 'active';
-    for (let i = 1; i<pageLinks.length; i++){
-      pageLinks[i].className = '';
-    };
-  }
-    //function for unhiding the list display and hiding the 'noMatch'div when a matched search is found AFTER the user got to a 'No match' result.
-  function clearNoMatchDisplay (){
-    if (studentList.style.display === 'none'){
-      studentList.style.display = '';
-      pagination.style.display ='';
-      noMatch.style.display = 'none';
-    };
-  }
+
+
   searchText += '';
   searchText.toUpperCase();
   if (searchText !== ''){
+    if (searchButton.textContent === 'Clear'){
+      searchButton.textContent = 'Search';
+    };
     resetActivePage();
     clearNoMatchDisplay();
     findAndDisplay();
@@ -126,8 +146,7 @@ searchBar.addEventListener('keyup', (e) => {
 
 //Contains all logic for how many items to displa, which page should be active and has the event handler for the pagination options
 function displayPagination (list, pageNumber){
-
-  //function for creating the proper number of page elements and setting the proper class.
+    //function for creating the initial number of page elements for the master list and setting the proper class.
   function createPages(i){
     const li = document.createElement('li');
     const a = document.createElement('a');
@@ -141,57 +160,64 @@ function displayPagination (list, pageNumber){
       a.className = '';
     };
   }
-
-
-
-    //when a search is ran I call the DisplayPagination function. With this if statement, I can hide/displayed
-    //the proper number of existing pagination items based on search results or to display all pages again if user clears search box
-    let activeElement = document.activeElement
-    if(matchedSearch.length !== 0 || activeElement === searchBar){
-      //constant to hold the count of li for hiding and showing
-      const pageItems = document.querySelectorAll('.pageNumbers li');
-      //definines the current # of pages displayed which will be used for display logic below
-      const currentPages = () => {
-        let count = 0;
-        for (let i = 0; i<pageItems.length; i++){
-          if (pageItems[i].style.display === ''){
-            count += 1;
-          };
+  //when a search is ran I call the DisplayPagination function. With this if statement, I can hide/displayed
+  //the proper number of existing pagination items based on search results or to display all pages again if user clears search box
+  function updatePageDisplay () {
+    //constant to hold the count of li for hiding and showing
+    const pageItems = document.querySelectorAll('.pageNumbers li');
+    //defines the current # of pages displayed which will be used for display logic below
+    const currentPages = () => {
+      let count = 0;
+      for (let i = 0; i<pageItems.length; i++){
+        if (pageItems[i].style.display === ''){
+          count += 1;
         };
-        return count;
-      }
+      };
+      return count;
+    }
 
-      let newPages;//stores the number of pages now visible after search content has changed
-//logic for defining if we are coming from a search list to a new search list or coming from a search list back to master list. Based on that, the display for the pagination goes different paths below
-      if (matchedSearch.length === 0){
-        newPages = pages(studentListItems);
-      } else {
-        newPages = pages(matchedSearch);
-      }
-/* As the pagination list changes throughout user behavior (especially with a live search function), we need to be
-handle a jump between any number of pages and properly display the right number of available pages. This
-statement below does just that by calculating the change between currentPages and newPages and then acting accordingly
-*/
-      const pagesDifference = newPages - currentPages();
-        if (pagesDifference>0){
-          for (let i = currentPages(); i< newPages; i++){
-            pageItems[i].style.display = '';
-          };
-        } else if (pagesDifference<0){
-          const pagestoHide = Math.abs(pagesDifference);
-          for (let i = (newPages); i<pageItems.length; i++){
-            pageItems[i].style.display = 'none';
-          };
+    let newPages;//stores the number of pages now visible after search content has changed
+    //logic for defining if we are coming from a search list to a new search list or coming from a search list back to master list. Based on that, the display for the pagination goes different paths below
+    if (matchedSearch.length === 0){
+      newPages = pages(studentListItems);
+    } else {
+      newPages = pages(matchedSearch);
+    }
+    /* As the pagination list changes throughout user behavior (especially with a live search function), we need to be
+    handle a jump between any number of pages and properly display the right number of available pages. This
+    statement below does just that by calculating the change between currentPages and newPages and then acting accordingly
+    */
+    const pagesDifference = newPages - currentPages();
+      if (pagesDifference>0){
+        for (let i = currentPages(); i< newPages; i++){
+          pageItems[i].style.display = '';
         };
+      } else if (pagesDifference<0){
+        const pagestoHide = Math.abs(pagesDifference);
+        for (let i = (newPages); i<pageItems.length; i++){
+          pageItems[i].style.display = 'none';
+        };
+      };
+  }
+  let activeElement = document.activeElement;
+  if(matchedSearch.length !== 0 || activeElement === searchBar){
+    updatePageDisplay();
+  }
+  // this else statement is pretty much used for when the page is first loaded and we have our initial list of students
+  // and is also used for creating the master # of pagination options that could be hidden/unhidden based on search results
+
+  else if(activeElement === searchButton){
+      updatePageDisplay();
+    }
     // this else statement is pretty much used for when the page is first loaded and we have our initial list of students
     // and is also used for creating the master # of pagination options that could be hidden/unhidden based on search results
-    } else {
+     else {
         for (i = 1; i <= pages(list); i++){
           createPages(i);
         };
-    }
+    };
   //creates reference for all of the pages so that I can assign the active page class for proper highlighting
-  const pageLinks = document.querySelectorAll('a');
+  pageLinks = document.querySelectorAll('a');
 
     //Event handler for when user interacts with the pagination tool. Gets the text content (aka pageNumber) from the target element
     // and passes it to the ShowPage function to display the proper content and then sets the proper active class for highligting the active page
@@ -215,8 +241,8 @@ statement below does just that by calculating the change between currentPages an
       };
 
     });
-}
 
+}
 //Adding search bar to the pages
 function displaySearch(){
   //set HTML header element to variable & create/add Div that will hold search bar and search buttons
@@ -279,8 +305,11 @@ function findAndDisplay () {
         }, 300);
 
 
-      noMatch.style.display = '';
-      noMatch.textContent = `No matches. Please adjust your search value.`;
+      noMatchDisplay.style.display = '';
+      //noMatchDisplay.textContent = `No matches. Please adjust your search value.`;
+      searchButton.textContent = 'Clear'
+
+
 //Case 2: user clicked search with no search text entered
   } else if (searchBar.value === ''){
     searchBar.classList.add('error');
@@ -297,7 +326,30 @@ function findAndDisplay () {
     };
   }
   //event handler for running searchBar when user clicks
-  searchButton.addEventListener('click', findAndDisplay);
+  searchButton.addEventListener('click', ()=>{
+    if (searchButton.textContent === 'Search'){
+      findAndDisplay;
+    } if (searchButton.textContent === 'Clear'){
+      //function for resetting studentListItems display in the event the list was filtered before going to
+      for (i=0; i<studentListItems.length; i++){
+        studentListItems[i].style.display = 'none';
+      };
+        searchButton.textContent = 'Search';
+        searchBar.value = '';
+        searchText = '';
+        clearNoMatchDisplay();
+        matchedSearch = [];
+        resetActivePage();
+        showPage(studentListItems, 1);
+        displayPagination(studentListItems,1);
+
+
+
+
+
+
+  }
+  });
   //event handler for running searchBar when user presses ENTER while active in the searchBar
   searchBar.addEventListener("keyup", (e) => {
     if (e.keyCode === 13 || e.which === 13) {
@@ -314,4 +366,3 @@ use element.innerHTML for applying the error text when no match is found within 
 showPage(studentListItems,1);
 displaySearch();
 displayPagination(studentListItems,1);
-noMatch.style.display = 'none';//I created an HTML element for holding the text when there are no matched searches. Since I need to sometimes display it and sometimes not, I have to programattically turn it off and on. I need it off by default, thusly I am declaring it's display to none.
